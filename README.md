@@ -339,8 +339,6 @@ public class Tag implements Mentionable {
 ```
 ### MentionAdapter
 ```
-package com;
-
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -348,8 +346,6 @@ import android.widget.TextView;
 
 import org.jetbrains.annotations.NotNull;
 import android.support.v7.widget.RecyclerView;
-
-import com.alnafay.arzepak.interfaces.ItemClickListener;
 
 import java.util.List;
 
