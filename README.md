@@ -25,7 +25,7 @@ editText = (MentionsEditText) findViewById(R.id.activity_wall_new_post_des_edt);
 
 editText.setTokenizer(new WordTokenizer(new WordTokenizerConfig.Builder().
                 setExplicitChars("#@").setThreshold(1).setMaxNumKeywords(1).build()));
-        mentionTagAdapter = new MentionAdapter(null, new ItemClickListener(){
+        mentionTagAdapter = new MentionAdapter(new ItemClickListener(){
             public void onItemClick(Object object, int pos, int type){
                 mentionTagList.setVisibility(View.GONE);
                 if (type == 0) {
@@ -337,4 +337,92 @@ public class Tag implements Mentionable {
     }
 }
 ```
+### MentionAdapter
+```
+package com;
 
+import android.util.TypedValue;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+
+import org.jetbrains.annotations.NotNull;
+import android.support.v7.widget.RecyclerView;
+
+import com.alnafay.arzepak.interfaces.ItemClickListener;
+
+import java.util.List;
+
+public class MentionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+
+    public MentionAdapter(ItemClickListener itemClickListener) {
+        this.itemClickListener = itemClickListener;
+    }
+
+    private ItemClickListener itemClickListener;
+    private List<Friend> mentions = null;
+    private List<Tag> tags = null;
+
+    private boolean isMentions = true;
+
+    @NonNull
+    @Override
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        TextView tv = new TextView(parent.getContext());
+        tv.setLayoutParams(new RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT,
+                RecyclerView.LayoutParams.WRAP_CONTENT));
+        tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f);
+        tv.setPadding(15, 10, 15, 10);
+        return new RecyclerView.ViewHolder(tv) {
+        };
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, final int position) {
+        if (isMentions) {
+            ((TextView) holder.itemView).setText(mentions.get(position).getSuggestiblePrimaryText());
+        } else {
+            ((TextView) holder.itemView).setText(tags.get(position).getSuggestiblePrimaryText());
+        }
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (isMentions) {
+                    itemClickListener.onItemClick(mentions, position, 0);
+                } else {
+                    itemClickListener.onItemClick(mentions, position, 1);
+                }
+            }
+        });
+    }
+
+    public void setMentions(List<Friend> friends) {
+        mentions = friends;
+        isMentions = true;
+        notifyDataSetChanged();
+    }
+
+    public void setTags(List<Tag> tags) {
+        this.tags = tags;
+        isMentions = false;
+        notifyDataSetChanged();
+    }
+
+    @Override
+    public int getItemCount() {
+        if (isMentions) {
+            if (mentions == null) {
+                return 0;
+            } else {
+                return mentions.size();
+            }
+        } else {
+            if (tags == null) {
+                return 0;
+            } else {
+                return tags.size();
+            }
+        }
+    }
+}
+```
